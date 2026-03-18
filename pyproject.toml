@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[project]
+name = "passive_assistant"
+description = "A passive voice assistant that listens for a wake word and responds to user queries using OpenAI's GPT-3.5 Turbo model."
+version = "1.0.0"
+authors = [
+    { name = "Chukwudi" }
+]
+maintainers = [
+    { name = "Chukwudi" }
+]
+dependencies = [
+    "pystray",
+    "pillow",
+    "openwakeword",
+    "sounddevice",
+    "google-genai",
+    "pyttsx3"
+]

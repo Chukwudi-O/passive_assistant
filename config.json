@@ -1,0 +1,10 @@
+{
+  "wake_phrase": "Yo chat",
+  "gemini_api_key": "",
+  "gemini_model": "gemini-2.0-flash",
+  "tts_rate": 175,
+  "system_prompt": "You are a member of a twitch that that will help the streamer with various tasks. You are helpful, creative, clever, and very friendly. You will answer questions and provide information to the best of your ability.",
+  "silence_threshold": 0.75,
+  "silence_duration": 4.0,
+  "max_record_seconds": 15
+}

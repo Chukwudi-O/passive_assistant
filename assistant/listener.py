@@ -19,6 +19,7 @@ import os
 import sounddevice as sd
 from .audio   import AudioRecorder
 from .tts     import TTSEngine
+from .genai   import GenAI
 
 COOLDOWN_SECONDS = 1.0   # pause after TTS before listening again
 
@@ -28,7 +29,11 @@ class WakeWordListener:
         self._running   = True
         self.state      = state
         self.overlay    = overlay
-        self._genai     = None
+        self._genai     = GenAI(
+            model_name = state.get("gemini_model", "gemini-2.0-flash"),
+            api_key    = state.get("gemini_api_key", ""),
+            system_prompt = state.get("system_prompt", "")
+        )
         self._tts       = TTSEngine(state)
         self._audio     = AudioRecorder(
             silence_threshold = state.get("silence_threshold", 700),
@@ -46,29 +51,32 @@ class WakeWordListener:
     def run(self):
         print("[Listener] Starting wake-word loop …")
         hit_count = 0
-        try:
-            while self._running and self.state.running:
-                # If paused from tray or currently speaking, skip listening
-                if not self.state.is_listening() or self.state.is_processing():
-                    continue
+        while self._running and self.state.running:
+            try:
+                    # If paused from tray or currently speaking, skip listening
+                    if not self.state.is_listening() or self.state.is_processing():
+                        continue
 
-                # Otherwise, listen for the wake word
-                print("[Listener] Listening for wake word …")
-                detected = self._audio.listen_for_wake(hit_count=hit_count)
-                if detected:
-                    hit_count = 0
-                    print("[Listener] Wake word detected!")
-                    time.sleep(0.8)  # brief pause to avoid immediate retrigger
-                    self._handle_command()
-        except Exception as e:
-            print(f"[Listener] Error in main loop: {e}")
-        finally:
-            print("[Listener] Stopped.")
+                    # Otherwise, listen for the wake word
+                    print("[Listener] Listening for wake word …")
+                    detected = self._audio.listen_for_wake(hit_count=hit_count)
+                    if detected:
+                        hit_count = 0
+                        print("[Listener] Wake word detected!")
+                        time.sleep(1)  # brief pause to avoid immediate retrigger
+                        self._handle_command()
+            except Exception as e:
+                print(f"[Listener] Error in main loop: {e}")
+                self.state.set_processing(False)
+                self.overlay.hide()
+
+
+        print("[Listener] Stopped.")
 
     # ── pipeline ───────────────────────────────────────────────────────────────
 
     def _handle_command(self):
-        """Record → transcribe → GPT → TTS (blocking within this call)."""
+        """Record → transcribe → GenAI → TTS (blocking within this call)."""
         self.state.set_processing(True)
         self.overlay.show_listening()
 
@@ -77,10 +85,10 @@ class WakeWordListener:
         audio = self._audio.record_until_silence()
 
 
-        # 3. GPT
+        # 3. GenAI
         self.overlay.show_thinking()
         print("[Listener] Querying Gemini …")
-        reply = ""
+        reply = self._genai.generate_response(audio)
 
         print(f"[Listener] Reply: {reply}")
 

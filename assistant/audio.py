@@ -21,7 +21,6 @@ class AudioRecorder:
         self._silence_threshold = silence_threshold
         self._silence_duration  = silence_duration
         self._chunk_duration    = chunk_duration
-        self._silent_count      = 0
         self._model             = Model()
 
         sd.default.channels   = CHANNELS
@@ -33,18 +32,18 @@ class AudioRecorder:
         sd.wait()
         return chunk
 
-    def process_audio_chunk(self,chunk):
-        # Convert to correct format
-        audio = chunk[:, 0]  # mono
-        audio = (audio * 32767).astype(np.int16)
+    # def process_audio_chunk(self,chunk):
+    #     # Convert to correct format
+    #     audio = chunk[:, 0]  # mono
+    #     audio = (audio * 32767).astype(np.int16)
 
-        prediction = self._model.predict(audio)
+    #     prediction = self._model.predict(audio)
 
-        # prediction is a dict: {'wake_word_name': score}
-        for key, score in prediction.items():
-            if score > self._silence_threshold:
-                return True
-        return False
+    #     # prediction is a dict: {'wake_word_name': score}
+    #     for key, score in prediction.items():
+    #         if score > self._silence_threshold:
+    #             return True
+    #     return False
     
     def listen_for_wake(self,hit_count):
         detected = False
@@ -64,7 +63,7 @@ class AudioRecorder:
                 if score > self._silence_threshold:
                     hit_count += 1
 
-            if hit_count >= 25:
+            if hit_count >= 20:
                 detected = True
 
         with sd.InputStream(
@@ -80,24 +79,31 @@ class AudioRecorder:
         return True
 
     def record_until_silence(self):
+        """Record until silence is detected for the full silence_duration."""
         recorded_audio = []
         silence_chunks = int(self._silence_duration / self._chunk_duration)
+        min_chunks = 2.5  # minimum 2.5 seconds before we start checking for silence
+        silent_count = 0
 
         while True:
             chunk = self.get_audio_chunk()
-            
             recorded_audio.append(chunk)
 
-            volume = np.linalg.norm(chunk) / len(chunk)
+            # Calculate volume using RMS (root mean square) for more accurate audio level
+            rms = np.sqrt(np.mean(chunk**2))
 
-            if volume < self._silence_threshold:
-                self._silent_count += 1
-            else:
-                self._silent_count = 0
+            # Only start checking for silence after minimum recording time
+            if len(recorded_audio) >= min_chunks:
+                if rms < self._silence_threshold:
+                    silent_count += 1
+                else:
+                    silent_count = 0
 
-            if self._silent_count >= silence_chunks:
-                print("Silence detected. Stopping...")
-                break
+                # Stop when we've detected silence for the full duration
+                if silent_count >= silence_chunks:
+                    print("Silence detected. Stopping...")
+                    break
 
+        # Concatenate all chunks and return
         audio = np.concatenate(recorded_audio)
         return audio

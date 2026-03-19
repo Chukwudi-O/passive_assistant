@@ -175,8 +175,8 @@ class TrayApp:
             import traceback
             traceback.print_exc()
 
-    def _quit(self, icon, item):
+    def _quit(self, icon=None, item=None):
         print("[Tray] Quitting …")
         self.state.running = False
         self.listener.stop()
-        icon.stop()
+        if icon: icon.stop()

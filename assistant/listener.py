@@ -15,7 +15,6 @@ blocked.
 
 import threading
 import time
-import os
 import sounddevice as sd
 from .audio   import AudioRecorder
 from .tts     import TTSEngine
@@ -36,9 +35,8 @@ class WakeWordListener:
         )
         self._tts       = TTSEngine(state)
         self._audio     = AudioRecorder(
-            silence_threshold = state.get("silence_threshold", 700),
-            silence_duration  = state.get("silence_duration",  2.0),
-            chunk_duration    = 0.5,
+            chunk_duration      = 0.5,
+            state               = state
         )
 
     # ── public API ─────────────────────────────────────────────────────────────

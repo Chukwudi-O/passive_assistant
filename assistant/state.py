@@ -9,7 +9,7 @@ import os
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), '..', 'config.json')
 
 DEFAULT_CONFIG = {
-    "wake_phrase": "Yo chat",
+    "wake_phrase": "Hey Jarvis",
     "gemini_api_key": "",
     "gemini_model": "gemini-2.0-flash",
     "tts_rate": 175,
@@ -21,9 +21,9 @@ DEFAULT_CONFIG = {
         "Keep responses concise and conversational — ideally under 5 sentences unless more detail is clearly needed. "
         "Do not use markdown, bullet points, or special formatting; speak in plain natural language."
     ),
-    "silence_threshold": 700,
-    "silence_duration": 2.0,
-    "max_record_seconds": 15
+    "silence_threshold": 0.7,
+    "silence_duration": 4.0,
+    "max_record_seconds": 15,
 }
 
 

@@ -17,14 +17,14 @@ CHUNK_DURATION  = 0.5  # how long each audio chunk is when checking for silence
 
 
 class AudioRecorder:
-    def __init__(self, silence_threshold=700, silence_duration=2.0, chunk_duration=CHUNK_DURATION):
-        self._silence_threshold = silence_threshold
-        self._silence_duration  = silence_duration
+    def __init__(self,chunk_duration=CHUNK_DURATION,state=None):
+        self._silence_threshold = state.get("silence_threshold", 0.7)
+        self._silence_duration  = state.get("silence_duration", 4.0)
         self._chunk_duration    = chunk_duration
-        self._model             = Model()
-
-        sd.default.channels   = CHANNELS
-        sd.default.samplerate = SAMPLE_RATE
+        self._model             = Model(wakeword_models=[state.get("wake_phrase", "hey jarvis")])
+        self._state             = state
+        sd.default.channels     = CHANNELS
+        sd.default.samplerate   = SAMPLE_RATE
 
     def get_audio_chunk(self)-> np.ndarray:
         """Record a short chunk of audio and return it as a numpy array."""

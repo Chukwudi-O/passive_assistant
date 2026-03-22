@@ -53,7 +53,9 @@ class TTSEngine:
                 try:
                     if not self._engine:
                         self._init()
-                    self._apply_settings()
+                    else:
+                        self._apply_settings()
+                        
                     self._engine.say(text)
                     self._engine.runAndWait()
                 except Exception as e:

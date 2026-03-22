@@ -175,7 +175,7 @@ class SettingsDialog:
         self.state.set("max_record_seconds", int(self._max_record_entry.get()))
         self.state.set("system_prompt",      self._prompt_text.get("1.0", "end").strip())
     
-        messagebox.showinfo("Saved", "Settings saved.", parent=self._win)
+        messagebox.showinfo("Saved", "Settings saved. Restart the application to apply changes.", parent=self._win)
         self._quit()
 
     def _quit(self):

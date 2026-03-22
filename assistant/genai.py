@@ -11,7 +11,11 @@ class GenAI:
         self._model_name = model_name
         self._api_key = api_key
         self._system_prompt = system_prompt
-        self._client = genai.Client(api_key=api_key)
+        try:
+            self._client = self._client = genai.Client(api_key=api_key)
+        except Exception as e:
+            self._client = None
+
 
     def _to_wav_bytes(self, audio: Union[bytes, np.ndarray], sample_rate: int = 16000) -> bytes:
         """Ensure the audio is encoded as WAV bytes.

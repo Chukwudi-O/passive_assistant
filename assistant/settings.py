@@ -65,7 +65,7 @@ class SettingsDialog:
         model_value = state.get("gemini_model", "")
         
         self._model_box = ttk.Combobox(frame, width=30,
-                                  values=["gemini-pro-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"])
+                                  values=["gemini-pro-2.0-flash", "gemini-2.5-flash", "gemini-2.5-pro"])
         self._model_box.grid(row=row, column=1, sticky="ew", **pad)
         self._model_box.set(model_value)
         

@@ -17,7 +17,7 @@ import threading
 import time
 import sounddevice as sd
 
-from assistant.stt import SpeechToTextEngine
+from .stt import SpeechToTextEngine, transcribe_wav
 from .audio   import AudioRecorder
 from .tts     import TTSEngine
 from .genai   import GenAI
@@ -79,6 +79,7 @@ class WakeWordListener:
     def _handle_command(self):
         """Record → transcribe → GenAI → TTS (blocking within this call)."""
         self.state.set_processing(True)
+        self.state.set_listening(False)  # pause listening while processing command
         self.overlay.show_listening()
 
         # 1. Record the command
@@ -87,15 +88,14 @@ class WakeWordListener:
 
         #2. Transcribe the command
         print("[Listener] Transcribing audio …")
-        transcript = self._stt.transcribe(audio)
+        transcript = transcribe_wav(audio)
         print(f"[Listener] Transcript: {transcript}")
 
         # 3. GenAI
         self.overlay.show_thinking()
         print("[Listener] Querying Gemini …")
-        reply = "Testing Text to Speech"#self._genai.generate_response(transcript)
+        reply = transcript#self._genai.generate_response(transcript)
 
-        print(f"[Listener] Reply: {reply}")
 
         if not reply:
             self.overlay.hide()
@@ -110,10 +110,10 @@ class WakeWordListener:
 
         def on_done():
             done_event.set()
+            self.overlay.hide()
+            self.state.set_processing(False)
+            self.state.set_listening(True)  # resume listening for wake word
+            time.sleep(COOLDOWN_SECONDS)
 
         self._tts.speak(reply, on_done=on_done)
         done_event.wait()   # block until speech finishes
-
-        self.overlay.hide()
-        time.sleep(COOLDOWN_SECONDS)
-        self.state.set_processing(False)

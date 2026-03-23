@@ -13,9 +13,6 @@ class SettingsDialog:
     def __init__(self, parent_root, state, listener):
         self.state    = state
         self.listener = listener
-        
-        # Debug: Print the entire state config
-        
 
         win = tk.Toplevel(parent_root)
         win.title("Voice Assistant — Settings")

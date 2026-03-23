@@ -95,15 +95,3 @@ def transcribe_wav(
     except Exception as exc:
         print(f"[STT] Transcription error: {exc}")
         return None
-
-
-class SpeechToTextEngine:
-    def __init__(self, state):
-        self._state = state
-
-    def transcribe(
-        self,
-        audio: str | PathLike[str] | bytes | bytearray | np.ndarray,
-        sample_rate: int = 16000,
-    ) -> str | None:
-        return transcribe_wav(audio, sample_rate=sample_rate)

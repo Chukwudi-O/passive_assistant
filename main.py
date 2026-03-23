@@ -15,9 +15,7 @@ def main():
     listener_thread = Thread(target=listener.run, daemon=True, name="listener")
     listener_thread.start()
 
-    #TrayApp.run() #blocks on the main thread until Quit
     tray = TrayApp(state, listener, overlay)
-    #listener.setTray(tray) # allows listener to signal tray to update menu
     tray.run()
 
 

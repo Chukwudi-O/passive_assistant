@@ -17,7 +17,7 @@ import threading
 import time
 import sounddevice as sd
 
-from .stt import SpeechToTextEngine, transcribe_wav
+from .stt import transcribe_wav
 from .audio   import AudioRecorder
 from .tts     import TTSEngine
 from .genai   import GenAI
@@ -31,7 +31,6 @@ class WakeWordListener:
         self.state          = state
         self.overlay        = overlay
         self._tts           = TTSEngine(state)
-        self._stt           = SpeechToTextEngine(state)
         self._genai         = GenAI(
             model_name      = state.get("gemini_model", "gemini-2.0-flash"),
             api_key         = state.get("gemini_api_key", ""),

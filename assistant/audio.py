@@ -78,11 +78,11 @@ class AudioRecorder:
         print("Wake word detected!")
         return True
 
-    def record_until_silence(self):
+    def record_until_silence(self) -> np.ndarray:
         """Record until silence is detected for the full silence_duration."""
         recorded_audio = []
         silence_chunks = int(self._silence_duration / self._chunk_duration)
-        min_chunks = 2.5  # minimum 2.5 seconds before we start checking for silence
+        min_chunks = 1  # minimum 2.5 seconds before we start checking for silence
         silent_count = 0
 
         while True:

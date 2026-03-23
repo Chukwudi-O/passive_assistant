@@ -50,17 +50,13 @@ class GenAI:
 
         return buf.getvalue()
     
-    def generate_response(self, content:Union[bytes, np.ndarray]) -> str:
-        audio_bytes = self._to_wav_bytes(content)
+    def generate_response(self, content:str) -> str:
 
         response = self._client.models.generate_content(
             model=self._model_name,
             contents=[
                 self._system_prompt,
-                genai.types.Part.from_bytes(
-                    data=audio_bytes,
-                    mime_type="audio/wav"
-                )
+                content
             ]
         )
         return response.text
